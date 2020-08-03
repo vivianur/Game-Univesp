@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="animacao.js"></script>
+    <script src="colisor.js"></script>
+    <script src="fundo.js"></script>
+    <script src="nave.js"></script>
+    <script src="ovni.js"></script>
+    <script src="teclado.js"></script>
+    <script src="tiro.js"></script>
+  </head>
+  <body>
+    <canvas width="500" height="500"></canvas>
+  </body>
+  <script>
+    var imgEspaco = new Image();
+    imgEspaco.src = 'img/fundo-espaco.png';
+    imgEspaco.onload = carregando;
+
+    var imgEstrelas = new Image();
+    imgEstrelas.src = 'img/fundo-estrelas.png';
+    imgEstrelas.onload = carregando;
+
+    var imgNuvens = new Image();
+    imgNuvens.src = 'img/fundo-nuvens.png';
+    imgNuvens.onload = carregando;
+
+    var imgNave = new Image();
+    imgNave.src = 'img/nave.png';
+    imgNave.onload = carregando;
+
+    var imgOvni = new Image();
+    imgOvni.src = 'img/ovni.png';
+    imgOvni.onload = carregando;
+
+    var canvas = document.querySelector('canvas');
+    var context = canvas.getContext('2d');
+
+    var teclado = new Teclado(document);
+    var animacao = new Animacao(context);
+
+    var fundoEspaco = new Fundo(context, imgEspaco);
+    fundoEspaco.velocidade = 3;
+    animacao.novoSprite(fundoEspaco);
+
+    var fundoEstrelas = new Fundo(context, imgEstrelas);
+    fundoEstrelas.velocidade = 7;
+    animacao.novoSprite(fundoEstrelas);
+
+    var fundoNuvens = new Fundo(context, imgNuvens);
+    fundoNuvens.velocidade = 10;
+    animacao.novoSprite(fundoNuvens);
+
+    var nave = new Nave(context, teclado, imgNave);
+    animacao.novoSprite(nave);
+
+    var colisor = new Colisor();
+    colisor.novoSprite(nave);
+    animacao.novoProcessamento(colisor);
+
+    teclado.disparou(ESPACO, function () {
+      nave.atirar();
+    });
+
+    var carregadas = 0;
+    var total = 5;
+
+    function carregando() {
+      carregadas++
+      if(carregadas == total) iniciar();
+    }
+    
+    function iniciar() {
+      nave.x = canvas.width / 2 - imgNave.width / 2;
+      nave.y = canvas.height - imgNave.height;
+      nave.velocidade = 5;
+      animacao.ligar();
+
+      setInterval(novoOvni, 1000);
+    }
+
+    function novoOvni() {
+      var ovni = new Ovni(context, imgOvni);
+      ovni.velocidade = Math.floor(5 + Math.random() * (20 - 5 + 1));
+      ovni.x = Math.floor(Math.random() *  canvas.width - imgOvni.width + 1);
+      ovni.y = - imgOvni.height;
+
+      animacao.novoSprite(ovni);
+      colisor.novoSprite(ovni);
+    }
+  
+
+  </script>
+</html>
